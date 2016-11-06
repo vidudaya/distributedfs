@@ -185,6 +185,7 @@ public class NeighbourCommunicationManager {
                     }
 
                     // Forward the request to RT
+                    // we need to forward the request as flooding, then without anonymity forward the result
 
                 } catch (Exception e) {
                     e.printStackTrace();
