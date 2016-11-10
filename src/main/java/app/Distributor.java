@@ -18,6 +18,10 @@ public class Distributor {
 
     public void setUpDistributor(String[] args) {
         //java -jar distributedfs-1.0-SNAPSHOT.jar 127.0.0.1 2000 vid12345 127.0.0.1 20000
+        //java -jar distributedfs-1.0-SNAPSHOT.jar 127.0.0.1 2001 sam12345 127.0.0.1 20000
+        //java -jar distributedfs-1.0-SNAPSHOT.jar 127.0.0.1 2002 las12345 127.0.0.1 20000
+        //java -jar distributedfs-1.0-SNAPSHOT.jar 127.0.0.1 2003 ron12345 127.0.0.1 20000
+        //java -jar distributedfs-1.0-SNAPSHOT.jar 127.0.0.1 2004 jim12345 127.0.0.1 20000
         String distributorNodeIp = getNodeIp(args);
         Integer distributorNodePort = getNodePort(args);
         String distributorNodeUsername = getDistributorName(args);
