@@ -20,9 +20,9 @@ public class DistributorInteract {
     // to search a file - ex : search file_name
     private final String SEARCH = "SEARCH";
     // reduce the log messages
-    private final String OFF_LOG = "OFFLOG";
+    private final String LOG_OFF = "LOGOFF";
     // increase the log messages
-    private final String ON_LOG = "ONLOG";
+    private final String LOG_ON = "LOGON";
     private Node distributorNode;
     private BufferedReader br;
 
@@ -49,10 +49,10 @@ public class DistributorInteract {
                         String fileNameToSearch = tokens[1];
                         distributorNode.searchFile(fileNameToSearch);
                     }
-                } else if (OFF_LOG.toLowerCase().equals(command)) {
+                } else if (LOG_OFF.toLowerCase().equals(command)) {
                     distributorNode.setIsDebugMode(false);
                     System.out.println(distributorNode.isDebugMode());
-                } else if (ON_LOG.toLowerCase().equals(command)) {
+                } else if (LOG_ON.toLowerCase().equals(command)) {
                     distributorNode.setIsDebugMode(true);
                 }
             }
