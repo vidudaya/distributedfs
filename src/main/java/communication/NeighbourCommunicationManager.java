@@ -70,6 +70,12 @@ public class NeighbourCommunicationManager {
         sender.sendMessage(messageToSend, neighbour.getIp(), neighbour.getPort());
     }
 
+    public void forwardSearchMessageToRoutingTable(String msg, Node distributorNode) {
+        for (NeighbourNode neighbour : distributorNode.getRoutingTable().getAllNeighbours()) {
+            sender.sendMessage(msg, neighbour.getIp(), neighbour.getPort());
+        }
+    }
+
     public void processReceivedMessage(String msg, Node distributorNode) {
         //length JOIN IP_address port_no name
         //length JOINOK value
@@ -184,9 +190,20 @@ public class NeighbourCommunicationManager {
                         System.out.println("No local results found");
                     }
 
-                    // Forward the request to RT
-                    // we need to forward the request as flooding, then without anonymity forward the result
-                    // when in develop - this should be on develop
+                    if (hopsCount < 10) {
+                        // Forward the request to RT
+                        // we need to forward the request as flooding, then without anonymity forward the result
+                        String messageToSend = commonSupport.generateMessageToSend(SEARCH
+                                , ip
+                                , port
+                                , name
+                                , fileName
+                                , String.valueOf(hopsCount)
+                                , reqId);
+                        forwardSearchMessageToRoutingTable(messageToSend, distributorNode);
+                    } else {
+                        System.out.println("Maximum hops count reached - message dropped");
+                    }
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -219,7 +236,7 @@ public class NeighbourCommunicationManager {
 
             if (countOfFiles > 0) {
                 for (int i = 0; i < countOfFiles; ++i) {
-                    System.out.println(tokens[pointer + i].replaceAll("_"," "));
+                    System.out.println(tokens[pointer + i].replaceAll("_", " "));
                 }
             }
         }
