@@ -39,10 +39,13 @@ public class DistributorInteract {
 
                 if (SHOW.toLowerCase().equals(command)) {
                     distributorNode.getTextStore().printFileList();
+                    System.out.print("\n" + distributorNode.getShell());
                 } else if (RT.toLowerCase().equals(command)) {
                     distributorNode.getRoutingTable().printRoutingTable();
+                    System.out.print("\n" + distributorNode.getShell());
                 } else if (LEAVE.toLowerCase().equals(command.toLowerCase())) {
                     distributorNode.leaveNetwork();
+                    System.out.print("\n" + distributorNode.getShell());
                 } else if (command.contains(SEARCH.toLowerCase())) {
                     String tokens[] = command.split(" ");
                     if (SEARCH.toLowerCase().equals(tokens[0].toLowerCase().trim())) {
@@ -51,9 +54,14 @@ public class DistributorInteract {
                     }
                 } else if (LOG_OFF.toLowerCase().equals(command)) {
                     distributorNode.setIsDebugMode(false);
-                    System.out.println(distributorNode.isDebugMode());
+                    System.out.println(distributorNode.getShell()
+                            .concat("logging messages reduced"));
+                    System.out.print("\n" + distributorNode.getShell());
                 } else if (LOG_ON.toLowerCase().equals(command)) {
                     distributorNode.setIsDebugMode(true);
+                    System.out.println(distributorNode.getShell()
+                            .concat("logging messages increased"));
+                    System.out.print("\n" + distributorNode.getShell());
                 }
             }
         }

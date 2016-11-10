@@ -29,14 +29,17 @@ public class NeighbourCommunicationManager {
     public void searchFileInNetwork(String fileName, Node distributorNode) {
         System.out.println(distributorNode.getShell()
                 .concat("Searching in network..."));
+
+        String uniqueId = commonSupport.getUniqueId();
         //length SER IP port name file_name hops req_id
         String messageToSend = commonSupport.generateMessageToSend(SEARCH, distributorNode.getIp()
                 , String.valueOf(distributorNode.getPort())
                 , distributorNode.getNodeIdentifier()
                 , fileName
                 , "1"
-                , commonSupport.getUniqueId());
-        //cache the uniqID
+                , uniqueId);
+
+        distributorNode.getRequestCache().addToCache(uniqueId);
 
         for (NeighbourNode neighbour : distributorNode.getRoutingTable().getAllNeighbours()) {
             sender.sendMessage(messageToSend, neighbour.getIp(), neighbour.getPort());
