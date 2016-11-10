@@ -1,7 +1,5 @@
 package support;
 
-import java.util.Arrays;
-
 /**
  * Created by Samiththa on 4/11/16.
  */
@@ -25,11 +23,16 @@ public class RequestCache {
         return false;
     }
 
+    /**
+     * the cache is a circular buffer with a limited size
+     *
+     * @param id
+     */
     public void addToCache(String id) {
         cache[pointer % LIMIT] = id;
         pointer = (pointer + 1) % LIMIT;
 
-        System.out.println("Request cache : " + Arrays.toString(cache));
+        //System.out.println("Request cache : " + Arrays.toString(cache));
     }
 
 }

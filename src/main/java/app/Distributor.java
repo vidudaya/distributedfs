@@ -35,12 +35,16 @@ public class Distributor {
         // creating a new Node with [ip|port|name]
         Node node = new Node(distributorNodeIp, distributorNodePort, distributorNodeUsername);
         try {
+            // this is for listening and handling the messages from other nodes
+            // the current node will listen to it's specified port all the time
             receiver = new Receiver(node);
         } catch (IOException e) {
             e.printStackTrace();
         }
         node.registerNodeWithBS(serverIP, serverPort);
         try {
+            // once the node is up and running the users can execute commands on that node
+            // this will capture those inputs and handle them
             new DistributorInteract(node).listenForUserRequests();
         } catch (IOException e) {
             e.printStackTrace();

@@ -5,7 +5,6 @@ import support.Node;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.SocketException;
 
 /**
  * Created by vidudaya on 4/11/16.
@@ -30,8 +29,9 @@ public class Receiver extends Thread {
                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
                 socket.receive(packet);
                 String message = new String(packet.getData(), 0, packet.getLength());
-
-                System.out.println("Received Message : " + message);
+                if (node.isDebugMode()) {
+                    System.out.println("Received Message : " + message);
+                }
                 node.processReceivedMessage(message);
             } catch (IOException e) {
                 e.printStackTrace();
