@@ -142,22 +142,26 @@ public class NeighbourCommunicationManager {
             }
 
         } else if (JOINOK.equals(cmd)) {
-            if ("0".equals(tokens[2])) {
-                System.out.println(distributorNode.getShell()
-                        .concat("Join Success"));
-            } else if ("9999".equals(tokens[2])) {
-                System.out.println("Join Failed");
-            } else {
-                System.out.println("Bad JOINOK response");
+            if (distributorNode.isDebugMode()) {
+                if ("0".equals(tokens[2])) {
+                    System.out.println(distributorNode.getShell()
+                            .concat("Join Success"));
+                } else if ("9999".equals(tokens[2])) {
+                    System.out.println("Join Failed");
+                } else {
+                    System.out.println("Bad JOINOK response");
+                }
             }
         } else if (LEAVEOK.equals(cmd)) {
-            if ("0".equals(tokens[2])) {
-                System.out.println(distributorNode.getShell()
-                        .concat("LEAVE Success with a Node"));
-            } else if ("9999".equals(tokens[2])) {
-                System.out.println("LEAVE Failed with a Node");
-            } else {
-                System.out.println("Bad LEAVEOK response");
+            if (distributorNode.isDebugMode()) {
+                if ("0".equals(tokens[2])) {
+                    System.out.println(distributorNode.getShell()
+                            .concat("LEAVE Success with a Node"));
+                } else if ("9999".equals(tokens[2])) {
+                    System.out.println("LEAVE Failed with a Node");
+                } else {
+                    System.out.println("Bad LEAVEOK response");
+                }
             }
         } else if (SEARCH.equals(cmd)) {
             //length SER IP port name file_name hops req_id
@@ -246,11 +250,16 @@ public class NeighbourCommunicationManager {
                 countOfFiles = Integer.parseInt(count);
                 hopsCount = Integer.parseInt(hops) + 1;
                 portNum = Integer.parseInt(port);
+
+                // add the responder to the routing table
+                // RT can get larger by this, since non-neighbours can be added also
+                NeighbourNode node = new NeighbourNode(ip, portNum, name);
+                distributorNode.getRoutingTable().addToRoutingTable(node);
             } catch (NumberFormatException e) {
                 e.printStackTrace();
             }
 
-            System.out.println(distributorNode.getShell()
+            System.out.println(("\n").concat(distributorNode.getShell())
                     .concat("[ Total of " + countOfFiles + " matching files found in " + name + " ]"));
 
             if (countOfFiles > 0) {
@@ -258,6 +267,8 @@ public class NeighbourCommunicationManager {
                     System.out.println("\t\t" + tokens[pointer + i].replaceAll("_", " "));
                 }
             }
+
+            System.out.print(distributorNode.getShell());
         }
 
     }
