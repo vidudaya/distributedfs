@@ -27,14 +27,19 @@ public class NeighbourCommunicationManager {
     }
 
     public void searchFileInNetwork(String fileName, Node distributorNode) {
-        System.out.println("Searching in network...");
+        System.out.println(distributorNode.getShell()
+                .concat("Searching in network..."));
+
+        String uniqueId = commonSupport.getUniqueId();
         //length SER IP port name file_name hops req_id
         String messageToSend = commonSupport.generateMessageToSend(SEARCH, distributorNode.getIp()
                 , String.valueOf(distributorNode.getPort())
                 , distributorNode.getNodeIdentifier()
                 , fileName
                 , "1"
-                , commonSupport.getUniqueId());
+                , uniqueId);
+
+        distributorNode.getRequestCache().addToCache(uniqueId);
 
         for (NeighbourNode neighbour : distributorNode.getRoutingTable().getAllNeighbours()) {
             sender.sendMessage(messageToSend, neighbour.getIp(), neighbour.getPort());
@@ -50,7 +55,8 @@ public class NeighbourCommunicationManager {
     public void leaveFromNetwork(ArrayList<NeighbourNode> neighbours, Node distributorNode) {
         for (NeighbourNode neighbour : neighbours) {
             leaveNeighbour(neighbour, distributorNode);
-            System.out.println("LEAVE message send to " + neighbour.getNodeIdentifier());
+            System.out.println(distributorNode.getShell()
+                    .concat("LEAVE message send to " + neighbour.getNodeIdentifier()));
         }
     }
 
@@ -123,6 +129,8 @@ public class NeighbourCommunicationManager {
 
                 String messageToSend = "";
                 if (success) {
+                    System.out.println(distributorNode.getShell()
+                            .concat("[ Node " + name + " left the network ]"));
                     messageToSend = commonSupport.generateMessageToSend(LEAVEOK, "0");
                 } else {
                     messageToSend = commonSupport.generateMessageToSend(LEAVEOK, "9999");
@@ -134,20 +142,26 @@ public class NeighbourCommunicationManager {
             }
 
         } else if (JOINOK.equals(cmd)) {
-            if ("0".equals(tokens[2])) {
-                System.out.println("Join Success");
-            } else if ("9999".equals(tokens[2])) {
-                System.out.println("Join Failed");
-            } else {
-                System.out.println("Bad JOINOK response");
+            if (distributorNode.isDebugMode()) {
+                if ("0".equals(tokens[2])) {
+                    System.out.println(distributorNode.getShell()
+                            .concat("Join Success"));
+                } else if ("9999".equals(tokens[2])) {
+                    System.out.println("Join Failed");
+                } else {
+                    System.out.println("Bad JOINOK response");
+                }
             }
         } else if (LEAVEOK.equals(cmd)) {
-            if ("0".equals(tokens[2])) {
-                System.out.println("LEAVE Success with a Node");
-            } else if ("9999".equals(tokens[2])) {
-                System.out.println("LEAVE Failed with a Node");
-            } else {
-                System.out.println("Bad LEAVEOK response");
+            if (distributorNode.isDebugMode()) {
+                if ("0".equals(tokens[2])) {
+                    System.out.println(distributorNode.getShell()
+                            .concat("LEAVE Success with a Node"));
+                } else if ("9999".equals(tokens[2])) {
+                    System.out.println("LEAVE Failed with a Node");
+                } else {
+                    System.out.println("Bad LEAVEOK response");
+                }
             }
         } else if (SEARCH.equals(cmd)) {
             //length SER IP port name file_name hops req_id
@@ -165,8 +179,9 @@ public class NeighbourCommunicationManager {
             } catch (NumberFormatException e) {
                 e.printStackTrace();
             }
-            System.out.println("Search request for [ " + fileName + " ] from " + name);
-
+            if (distributorNode.isDebugMode()) {
+                System.out.println("Search request for [ " + fileName + " ] from " + name);
+            }
             boolean isDuplicateReq = distributorNode.getRequestCache().isPossibleDuplicate(reqId);
             if (!isDuplicateReq) {
                 distributorNode.getRequestCache().addToCache(reqId);
@@ -183,11 +198,14 @@ public class NeighbourCommunicationManager {
                                 , String.valueOf(hopsCount)
                                 , commonSupport.getCombinedStringOfList(localStore));
 
-                        System.out.println("Local Search OK : [ " + commonSupport.getCombinedStringOfList(localStore) + " ]");
-
+                        if (distributorNode.isDebugMode()) {
+                            System.out.println("Local Search OK : [ " + commonSupport.getCombinedStringOfList(localStore) + " ]");
+                        }
                         sender.sendMessage(messageToSend, ip, portNum);
                     } else {
-                        System.out.println("No local results found");
+                        if (distributorNode.isDebugMode()) {
+                            System.out.println("No local results found");
+                        }
                     }
 
                     if (hopsCount < 10) {
@@ -202,7 +220,9 @@ public class NeighbourCommunicationManager {
                                 , reqId);
                         forwardSearchMessageToRoutingTable(messageToSend, distributorNode);
                     } else {
-                        System.out.println("Maximum hops count reached - message dropped");
+                        if (distributorNode.isDebugMode()) {
+                            System.out.println("Maximum hops count reached - message dropped");
+                        }
                     }
 
                 } catch (Exception e) {
@@ -210,7 +230,9 @@ public class NeighbourCommunicationManager {
                 }
 
             } else {
-                System.out.println("Duplicate Request");
+                if (distributorNode.isDebugMode()) {
+                    System.out.println("Duplicate Request");
+                }
                 // duplicate request - avoid processing
             }
         } else if (SEARCHOK.equals(cmd)) {
@@ -228,17 +250,25 @@ public class NeighbourCommunicationManager {
                 countOfFiles = Integer.parseInt(count);
                 hopsCount = Integer.parseInt(hops) + 1;
                 portNum = Integer.parseInt(port);
+
+                // add the responder to the routing table
+                // RT can get larger by this, since non-neighbours can be added also
+                NeighbourNode node = new NeighbourNode(ip, portNum, name);
+                distributorNode.getRoutingTable().addToRoutingTable(node);
             } catch (NumberFormatException e) {
                 e.printStackTrace();
             }
 
-            System.out.println("Total of " + countOfFiles + " matching files found in " + name);
+            System.out.println(("\n").concat(distributorNode.getShell())
+                    .concat("[ Total of " + countOfFiles + " matching files found in " + name + " ]"));
 
             if (countOfFiles > 0) {
                 for (int i = 0; i < countOfFiles; ++i) {
-                    System.out.println(tokens[pointer + i].replaceAll("_", " "));
+                    System.out.println("\t\t" + tokens[pointer + i].replaceAll("_", " "));
                 }
             }
+
+            System.out.print(distributorNode.getShell());
         }
 
     }

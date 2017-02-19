@@ -29,12 +29,14 @@ public class Node {
     private String serverIp;
     private Integer serverPort;
     private FileSearch fileSearch;
+    private boolean isDebugMode;
+    private String shell;
 
     public Node(String ip, Integer port, String nodeIdentifier) {
         this.ip = ip;
         this.port = port;
         this.nodeIdentifier = nodeIdentifier;
-        this.sender = new Sender();
+        this.sender = new Sender(this);
         this.commonSupport = new CommonSupport();
         this.routingTable = new RoutingTable();
         this.requestCache = new RequestCache();
@@ -46,6 +48,8 @@ public class Node {
         }
         this.bsCommunicationManager = new BSCommunicationManager(this);
         this.fileSearch = new FileSearch(this);
+        this.isDebugMode = true;
+        this.shell = nodeIdentifier.concat(" > ");
     }
 
     public void registerNodeWithBS(String serverIP, int serverPort) {
@@ -54,7 +58,9 @@ public class Node {
         int length = message.length() + PAD + 1;
         String formattedLength = commonSupport.getFormattedNumber(length, PAD);
         String messageToSend = formattedLength.concat(BLANK).concat(message);
-        System.out.println("messageToSend : " + messageToSend);
+        if (isDebugMode) {
+            System.out.println("messageToSend : " + messageToSend);
+        }
         String response;
 
         try {
@@ -79,7 +85,9 @@ public class Node {
                 , this.ip
                 , String.valueOf(this.port)
                 , this.getNodeIdentifier());
-        System.out.println("UNREG : " + messageToSend);
+        if (isDebugMode) {
+            System.out.println("UNREG : " + messageToSend);
+        }
         String response = bsCommunicationManager.sendMessageToBS(messageToSend, serverIp, serverPort).trim();
         if (response != null || !response.isEmpty()) {
             ArrayList<NeighbourNode> nodesInRT = bsCommunicationManager.handleBSResponse(response);
@@ -164,5 +172,17 @@ public class Node {
 
     public NeighbourCommunicationManager getNeighbourCommunicationManager() {
         return neighbourCommunicationManager;
+    }
+
+    public boolean isDebugMode() {
+        return isDebugMode;
+    }
+
+    public void setIsDebugMode(boolean isDebugMode) {
+        this.isDebugMode = isDebugMode;
+    }
+
+    public String getShell() {
+        return shell;
     }
 }

@@ -52,14 +52,15 @@ public class BSCommunicationManager {
             br.close();
             socketToServer.close();
         }
-        //System.out.println("responseFromBS : " + responseFromBS);
 
         return responseFromBS;
     }
 
     public ArrayList<NeighbourNode> handleBSResponse(String response) {
 
-        System.out.println("response : " + response);
+        if (distributor.isDebugMode()) {
+            System.out.println("response : " + response);
+        }
 
         String tokens[] = response.split(" ");
         String cmd = "";
@@ -77,11 +78,14 @@ public class BSCommunicationManager {
                 e.printStackTrace();
             }
 
-            System.out.println("Communication with the BS is a success and response received with REGOK");
-            System.out.println("response : " + response);
-
+            System.out.println(distributor.getShell()
+                    .concat("Communication with the BS is a success and response received with REGOK"));
+            if (distributor.isDebugMode()) {
+                System.out.println("response : " + response);
+            }
             if (nodeCount == 0) {
-                System.out.println("First node to join the network through BS");
+                System.out.println(distributor.getShell()
+                        .concat("First node to join the network through BS"));
             } else if (nodeCount == 9996) {
                 System.out.println("Error : failed, can’t register. BS full");
             } else if (nodeCount == 9997) {
@@ -91,7 +95,9 @@ public class BSCommunicationManager {
             } else if (nodeCount == 9999) {
                 System.out.println("Error : failed, there is some error in the command");
             } else {
-                System.out.println("Details of " + nodeCount + " nodes received");
+                if (distributor.isDebugMode()) {
+                    System.out.println("Details of " + nodeCount + " nodes received");
+                }
                 ArrayList<NeighbourNode> nodeList = new ArrayList<NeighbourNode>();
                 int cur = 3;
                 for (int i = 0; i < nodeCount; ++i) {
@@ -111,8 +117,11 @@ public class BSCommunicationManager {
             }
         } else if (UNROK.equals(cmd)) {
             //0012 UNROK 0
-            System.out.println("Communication with the BS is a success and response received with UNROK");
-            System.out.println("response : " + response);
+            System.out.println(distributor.getShell()
+                    .concat("Communication with the BS is a success and response received with UNROK"));
+            if (distributor.isDebugMode()) {
+                System.out.println("response : " + response);
+            }
             try {
                 int res = Integer.parseInt(tokens[2].trim());
                 if (res == 0) {

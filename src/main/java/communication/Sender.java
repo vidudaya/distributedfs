@@ -1,5 +1,7 @@
 package communication;
 
+import support.Node;
+
 import java.io.IOException;
 import java.net.*;
 
@@ -10,9 +12,16 @@ public class Sender {
 
     private DatagramSocket socket;
     private DatagramPacket datagramPacket;
+    private Node distributor;
+
+    public Sender(Node distributor) {
+        this.distributor = distributor;
+    }
 
     public void sendMessage(String msg, String receiverIp, int receiverPort) {
-        System.out.println("Message to Send : " + msg);
+        if (distributor.isDebugMode()) {
+            System.out.println("Message to Send : " + msg);
+        }
         try {
             InetAddress receiverAddress = InetAddress.getByName(receiverIp);
             byte[] buffer = msg.getBytes();
