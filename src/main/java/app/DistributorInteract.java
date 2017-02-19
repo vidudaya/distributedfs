@@ -23,6 +23,8 @@ public class DistributorInteract {
     private final String LOG_OFF = "LOGOFF";
     // increase the log messages
     private final String LOG_ON = "LOGON";
+    // help menu for commands
+    private final String HELP = "HELP";
     private Node distributorNode;
     private BufferedReader br;
 
@@ -61,6 +63,15 @@ public class DistributorInteract {
                     distributorNode.setIsDebugMode(true);
                     System.out.println(distributorNode.getShell()
                             .concat("logging messages increased"));
+                    System.out.print("\n" + distributorNode.getShell());
+                } else if (HELP.equalsIgnoreCase(command)) {
+                    System.out.println("'show'\t:\twill list down the file name list");
+                    System.out.println("'rt'\t:\twill list down the routing table of that node");
+                    System.out.println("'search <keyword>'\t:\twill search for a file with the keyword");
+                    System.out.println("'logoff\t:\twill turn off the debug mode");
+                    System.out.println("'logon'\t:\twill turn on the debug mode");
+                    System.out.println("'leave'\t:\twill disconnect the node from the network");
+                    System.out.println("'help'\t:\tHelp menu");
                     System.out.print("\n" + distributorNode.getShell());
                 }
             }
