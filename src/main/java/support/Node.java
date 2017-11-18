@@ -31,18 +31,20 @@ public class Node {
     private FileSearch fileSearch;
     private boolean isDebugMode;
     private String shell;
+    private Wall wall;
 
     public Node(String ip, Integer port, String nodeIdentifier) {
         this.ip = ip;
         this.port = port;
         this.nodeIdentifier = nodeIdentifier;
         this.sender = new Sender(this);
-        this.commonSupport = new CommonSupport();
+        this.commonSupport = new CommonSupport(this);
         this.routingTable = new RoutingTable();
         this.requestCache = new RequestCache();
-        this.neighbourCommunicationManager = new NeighbourCommunicationManager(sender);
+        this.neighbourCommunicationManager = new NeighbourCommunicationManager(sender, this);
         try {
             this.textStore = new TextStore(this.commonSupport.getRandomFileList());
+            this.wall = new Wall(this.commonSupport.getRandomFilePostMap());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -184,5 +186,13 @@ public class Node {
 
     public String getShell() {
         return shell;
+    }
+
+    public Wall getWall() {
+        return wall;
+    }
+
+    public void setWall(Wall wall) {
+        this.wall = wall;
     }
 }

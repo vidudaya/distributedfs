@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -13,6 +15,11 @@ import java.util.Random;
 public class CommonSupport {
 
     private final String BLANK = " ";
+    private Node node;
+
+    public CommonSupport(Node node) {
+        this.node = node;
+    }
 
     public String getFormattedNumber(int number, int pad) {
         String formatted = String.format("%0" + pad + "d", number);
@@ -85,5 +92,15 @@ public class CommonSupport {
         }
 
         return messageToSend.trim();
+    }
+
+    public Map<String, FilePost> getRandomFilePostMap() throws IOException {
+        ArrayList<String> list = getRandomFileList();
+        Map<String, FilePost> fpMap = new HashMap<String, FilePost>();
+        for (String s : list) {
+            FilePost fp = new FilePost(s, node);
+            fpMap.put(fp.getId(), fp);
+        }
+        return fpMap;
     }
 }

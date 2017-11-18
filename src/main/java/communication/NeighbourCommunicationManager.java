@@ -1,6 +1,7 @@
 package communication;
 
 import support.CommonSupport;
+import support.FilePost;
 import support.NeighbourNode;
 import support.Node;
 
@@ -20,10 +21,12 @@ public class NeighbourCommunicationManager {
     private final String BLANK = " ";
     private Sender sender;
     private CommonSupport commonSupport;
+    private Node node;
 
-    public NeighbourCommunicationManager(Sender sender) {
+    public NeighbourCommunicationManager(Sender sender, Node node) {
         this.sender = sender;
-        this.commonSupport = new CommonSupport();
+        this.commonSupport = new CommonSupport(node);
+        this.node = node;
     }
 
     public void searchFileInNetwork(String fileName, Node distributorNode) {
@@ -186,6 +189,7 @@ public class NeighbourCommunicationManager {
             if (!isDuplicateReq) {
                 distributorNode.getRequestCache().addToCache(reqId);
                 ArrayList<String> localStore = distributorNode.getTextStore().returnAllPartialMatches(fileName);
+                ArrayList<FilePost> fpStore = distributorNode.getWall().returnAllPartialMatches(fileName);
 
                 try {
                     if (localStore.size() > 0) {

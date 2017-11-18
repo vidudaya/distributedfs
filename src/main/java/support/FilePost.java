@@ -23,6 +23,27 @@ public class FilePost {
         ranks = new HashSet<Rank>();
     }
 
+    public static String displayPost(FilePost post) {
+        StringBuilder show = new StringBuilder();
+        show.append("[" + post.getId() + "]" + post.getFileName()).append("\n");
+        addCommentsToShow(post.getComments(), show, 1);
+
+        return show.toString();
+    }
+
+    public static void addCommentsToShow(List<Comment> coms, StringBuilder show, int indent) {
+        String gap = "";
+        for (int i = 0; i < indent; i++) {
+            gap += "\t";
+        }
+        for (Comment com : coms) {
+            show.append(gap).append("[" + com.getId() + "]" + com.getComment() + "\n");
+            if (!com.getComments().isEmpty()) {
+                addCommentsToShow(com.getComments(), show, indent + 1);
+            }
+        }
+    }
+
     public void addRank(Integer rank, String userName) {
         this.ranks.add(new Rank(rank, userName));
     }
@@ -45,5 +66,10 @@ public class FilePost {
 
     public String getFileName() {
         return fileName;
+    }
+
+    @Override
+    public String toString() {
+        return displayPost(this);
     }
 }

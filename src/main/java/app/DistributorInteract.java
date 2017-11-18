@@ -8,6 +8,8 @@ import java.io.InputStreamReader;
 
 /**
  * Created by vidudaya on 4/11/16.
+ * <p/>
+ * User interact with the node itself
  */
 public class DistributorInteract {
 
@@ -25,6 +27,7 @@ public class DistributorInteract {
     private final String LOG_ON = "LOGON";
     // help menu for commands
     private final String HELP = "HELP";
+    private final String SELECT = "SELECT";
     private Node distributorNode;
     private BufferedReader br;
 
@@ -40,7 +43,8 @@ public class DistributorInteract {
                 command = br.readLine().trim().toLowerCase();
 
                 if (SHOW.toLowerCase().equals(command)) {
-                    distributorNode.getTextStore().printFileList();
+                    //distributorNode.getTextStore().printFileList();
+                    distributorNode.getWall().printFileList();
                     System.out.print("\n" + distributorNode.getShell());
                 } else if (RT.toLowerCase().equals(command)) {
                     distributorNode.getRoutingTable().printRoutingTable();
@@ -71,8 +75,17 @@ public class DistributorInteract {
                     System.out.println("'logoff\t:\twill turn off the debug mode");
                     System.out.println("'logon'\t:\twill turn on the debug mode");
                     System.out.println("'leave'\t:\twill disconnect the node from the network");
+                    System.out.println("'select'\t:\twill allow the user to select a post to expand");
                     System.out.println("'help'\t:\tHelp menu");
                     System.out.print("\n" + distributorNode.getShell());
+                } else if (SELECT.equalsIgnoreCase(command)) {
+                    System.out.println("'Enter the post ID : ");
+                    String postID = br.readLine();
+                    if (distributorNode.getWall().getFiles().containsKey(postID)) {
+                        System.out.println(distributorNode.getWall().getFiles().get(postID));
+                    } else {
+                        System.out.println("No file found for the given ID");
+                    }
                 }
             }
         }
