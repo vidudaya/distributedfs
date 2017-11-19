@@ -1,13 +1,11 @@
 package communication;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import support.CommonSupport;
-import support.FilePost;
-import support.NeighbourNode;
-import support.Node;
+import support.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -271,12 +269,6 @@ public class NeighbourCommunicationManager {
 
             System.out.println(("\n").concat(distributorNode.getShell())
                     .concat("[ Total of " + countOfFiles + " matching files found in " + name + " ]"));
-            /*
-            if (countOfFiles > 0) {
-                for (int i = 0; i < countOfFiles; ++i) {
-                    System.out.println("\t\t" + tokens[pointer + i].replaceAll("_", " "));
-                }
-            }*/
 
             System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
             ObjectMapper mapper = new ObjectMapper();
@@ -302,13 +294,93 @@ public class NeighbourCommunicationManager {
 
     }
 
+    /**
+     * When SEARCHOK the received entries need to be merged with the Wall
+     * Comments and the Ranks should be merged
+     * <p/>
+     * If new FilePost arrives then can safely add that to the Wall without the need for merging
+     *
+     * @param fpList
+     */
     public void mergePosts(ArrayList<FilePost> fpList) {
         Map<String, FilePost> postsMap = node.getWall().getFiles();
-        for (FilePost fp : fpList) {
-            if (postsMap.containsKey(fp.getId())) {
-                // merge
+        for (FilePost receivedFp : fpList) {
+            if (postsMap.containsKey(receivedFp.getId())) {
+                FilePost existingFp = postsMap.get(receivedFp.getId());
+                // merge the ranks and comments
+                // mergeRanks(existingFp, receivedFp)
+                mergeComments(existingFp, receivedFp);
             } else {
-                node.getWall().addToWall(fp, fp.getId());
+                // new post
+                node.getWall().addToWall(receivedFp, receivedFp.getId());
+            }
+        }
+    }
+
+    /**
+     * This method will merge the comments in the FilePost
+     * New comments can be added directly
+     *
+     * @param existingFp
+     * @param receivedFp
+     */
+    public void mergeComments(FilePost existingFp, FilePost receivedFp) {
+        List<Comment> existingComments = existingFp.getComments();
+        List<Comment> receivedComments = receivedFp.getComments();
+
+        for (Comment comment : receivedComments) {
+            if (existingComments.contains(comment)) {
+                Comment existingComment = existingComments.get(existingComments.indexOf(comment));
+
+                // since the comment is already in the list, it should be merged
+                //mergeRanks(comment, existingComment)
+                mergeComments(existingComment, comment);
+            } else {
+                existingComments.add(comment);
+            }
+        }
+    }
+
+    /**
+     * This method will merge the comments in a Comment
+     * Since the comments can contain comments, the merging should be handled in a recursive manner
+     *
+     * @param existingComment
+     * @param receivedComment
+     */
+    public void mergeComments(Comment existingComment, Comment receivedComment) {
+        if (existingComment.getComments().isEmpty()) {
+            if (receivedComment.getComments().isEmpty()) {
+                // ignore
+            } else {
+                existingComment.setComments(receivedComment.getComments());
+            }
+        } else {
+            if (receivedComment.getComments().isEmpty()) {
+                // ignore
+            } else {
+                mergeReplyComments(existingComment, receivedComment);
+            }
+        }
+    }
+
+    /**
+     * This method will merge the reply comments recursively
+     *
+     * @param existingComment
+     * @param receivedComment
+     */
+    private void mergeReplyComments(Comment existingComment, Comment receivedComment) {
+        List<Comment> existingReplyComments = existingComment.getComments();
+        List<Comment> receivedReplyComments = receivedComment.getComments();
+
+        for (Comment receivedReplyComment : receivedReplyComments) {
+            if (existingReplyComments.contains(receivedReplyComment)) {
+                Comment existingReplyComment = existingReplyComments.get(existingReplyComments.indexOf(receivedReplyComment));
+                // mergeRanks
+                mergeComments(existingReplyComment, receivedReplyComment);
+            } else {
+                existingReplyComments.add(receivedReplyComment);
             }
         }
     }

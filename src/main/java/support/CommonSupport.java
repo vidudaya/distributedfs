@@ -112,7 +112,7 @@ public class CommonSupport {
         ArrayList<String> list = getRandomFileList();
         Map<String, FilePost> fpMap = new HashMap<String, FilePost>();
         for (String s : list) {
-            FilePost fp = new FilePost(s, node);
+            FilePost fp = new FilePost(s);
             fpMap.put(fp.getId(), fp);
         }
         return fpMap;

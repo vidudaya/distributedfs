@@ -17,7 +17,7 @@ public class FilePost {
     private Set<Rank> ranks;
     private String fileName;
 
-    public FilePost(String fileName, Node node) {
+    public FilePost(String fileName) {
         this.fileName = fileName;
         String fileId = String.valueOf(fileName.hashCode()); // change this to be more unique with timestamp or lamport timestamp
         this.id = fileId;
@@ -60,6 +60,10 @@ public class FilePost {
 
     public Set<Rank> getRanks() {
         return ranks;
+    }
+
+    public void setRanks(Set<Rank> ranks) {
+        this.ranks = ranks;
     }
 
     public List<Comment> getComments() {

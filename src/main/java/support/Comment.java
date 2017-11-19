@@ -61,11 +61,30 @@ public class Comment {
         return comments;
     }
 
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
+    }
+
     public double getRank() {
         double rankAvg = 0;
         for (Rank rank : ranks) {
             rankAvg += rank.getRank();
         }
         return rankAvg / ranks.size(); //  to first decimal point
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Comment comment = (Comment) o;
+
+        return id.equals(comment.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
     }
 }
