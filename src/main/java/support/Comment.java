@@ -21,6 +21,16 @@ public class Comment {
         ranks = new HashSet<Rank>();
     }
 
+    public Comment getCommentWithId(String id) {
+        if (this.id.equals(id)) {
+            return this;
+        }
+        for (Comment comment : comments) {
+            return comment.getCommentWithId(id);
+        }
+        return null;
+    }
+
     public void addRank(Integer rank, String userName) {
         this.ranks.add(new Rank(rank, userName));
     }
@@ -43,5 +53,13 @@ public class Comment {
 
     public List<Comment> getComments() {
         return comments;
+    }
+
+    public double getRank() {
+        double rankAvg = 0;
+        for (Rank rank : ranks) {
+            rankAvg += rank.getRank();
+        }
+        return rankAvg / ranks.size(); //  to first decimal point
     }
 }

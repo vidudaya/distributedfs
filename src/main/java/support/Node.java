@@ -195,4 +195,41 @@ public class Node {
     public void setWall(Wall wall) {
         this.wall = wall;
     }
+
+    public void commentOnPostItem(String id, String msg) {
+        Comment comment = new Comment(msg, this);
+        for (FilePost fp : wall.getFiles().values()) {
+            if (fp.getId().equals(id)) {
+                fp.addComment(comment);
+                return;
+            } else {
+                for (Comment com : fp.getComments()) {
+                    Comment comSelected = com.getCommentWithId(id);
+                    if (comSelected != null) {
+                        comSelected.addComment(comment);
+                        return;
+                    }
+                }
+            }
+        }
+        System.out.println("Comment failed - No match for the entered id");
+    }
+
+    public void rankPostItem(String id, String rating) {
+        for (FilePost fp : wall.getFiles().values()) {
+            if (fp.getId().equals(id)) {
+                fp.addRank(Integer.valueOf(rating), this.nodeIdentifier);
+                return;
+            } else {
+                for (Comment com : fp.getComments()) {
+                    Comment comSelected = com.getCommentWithId(id);
+                    if (comSelected != null) {
+                        comSelected.addRank(Integer.valueOf(rating), this.nodeIdentifier);
+                        return;
+                    }
+                }
+            }
+        }
+        System.out.println("Ratings failed - No match for the entered id");
+    }
 }

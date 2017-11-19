@@ -103,4 +103,12 @@ public class CommonSupport {
         }
         return fpMap;
     }
+
+    public String getStringFromArray(String[] arr) {
+        StringBuilder sb = new StringBuilder();
+        for (String s : arr) {
+            sb.append(s).append(" ");
+        }
+        return sb.toString();
+    }
 }

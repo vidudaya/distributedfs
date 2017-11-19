@@ -1,10 +1,12 @@
 package app;
 
+import support.CommonSupport;
 import support.Node;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 
 /**
  * Created by vidudaya on 4/11/16.
@@ -30,10 +32,12 @@ public class DistributorInteract {
     private final String SELECT = "SELECT";
     private Node distributorNode;
     private BufferedReader br;
+    private CommonSupport commonSupport;
 
     public DistributorInteract(Node distributorNode) {
         this.distributorNode = distributorNode;
         this.br = new BufferedReader(new InputStreamReader(System.in));
+        this.commonSupport = new CommonSupport(distributorNode);
     }
 
     public void listenForUserRequests() throws IOException {
@@ -78,14 +82,30 @@ public class DistributorInteract {
                     System.out.println("'select'\t:\twill allow the user to select a post to expand");
                     System.out.println("'help'\t:\tHelp menu");
                     System.out.print("\n" + distributorNode.getShell());
-                } else if (SELECT.equalsIgnoreCase(command)) {
-                    System.out.println("'Enter the post ID : ");
-                    String postID = br.readLine();
+                } else if (command.startsWith("select")) {
+                    String tokens[] = command.split(" ");
+                    String postID = tokens[1];
                     if (distributorNode.getWall().getFiles().containsKey(postID)) {
                         System.out.println(distributorNode.getWall().getFiles().get(postID));
+                        System.out.println("#############################");
+                        System.out.println("to comment use comment <id> <comment>");
+                        System.out.println("to rank use rank <id> <rank between 1-5>");
+                        System.out.println("#############################");
                     } else {
                         System.out.println("No file found for the given ID");
                     }
+                } else if (command.startsWith("comment")) {
+                    String tokens[] = command.split(" ");
+                    String msg = commonSupport.getStringFromArray(Arrays.copyOfRange(tokens, 2, tokens.length));
+
+                    distributorNode.commentOnPostItem(tokens[1], msg);
+                } else if (command.startsWith("rank")) {
+                    String tokens[] = command.split(" ");
+                    String postID = tokens[1];
+                    String rank = tokens[2];
+
+                    distributorNode.rankPostItem(postID, rank);
+
                 }
             }
         }

@@ -25,7 +25,7 @@ public class FilePost {
 
     public static String displayPost(FilePost post) {
         StringBuilder show = new StringBuilder();
-        show.append("[" + post.getId() + "]" + post.getFileName()).append("\n");
+        show.append("[" + post.getId() + "]" + post.getFileName()).append("[" + post.getRank() + "]").append("\n");
         addCommentsToShow(post.getComments(), show, 1);
 
         return show.toString();
@@ -37,7 +37,7 @@ public class FilePost {
             gap += "\t";
         }
         for (Comment com : coms) {
-            show.append(gap).append("[" + com.getId() + "]" + com.getComment() + "\n");
+            show.append(gap).append("[" + com.getId() + "]" + com.getComment() + "[" + com.getRank() + "]" + "\n");
             if (!com.getComments().isEmpty()) {
                 addCommentsToShow(com.getComments(), show, indent + 1);
             }
@@ -71,5 +71,13 @@ public class FilePost {
     @Override
     public String toString() {
         return displayPost(this);
+    }
+
+    public double getRank() {
+        double rankAvg = 0;
+        for (Rank rank : ranks) {
+            rankAvg += rank.getRank();
+        }
+        return rankAvg / ranks.size(); //  to first decimal point
     }
 }
