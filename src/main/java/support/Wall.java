@@ -9,9 +9,9 @@ import java.util.Map;
  * This is a store of the movies
  */
 public class Wall {
-    private Map<String,FilePost> files;
+    private Map<String, FilePost> files;
 
-    public Wall(Map<String,FilePost> files) {
+    public Wall(Map<String, FilePost> files) {
         this.files = files;
     }
 
@@ -41,5 +41,11 @@ public class Wall {
             System.out.println("[" + file.getId() + "] " + file.getFileName());
         }
         System.out.println("#####################################################");
+    }
+
+    public void addToWall(FilePost fp, String id) {
+        if (!files.containsKey(id)) {
+            files.put(id, fp);
+        }
     }
 }

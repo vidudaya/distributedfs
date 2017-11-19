@@ -8,6 +8,7 @@ import support.Node;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -293,10 +294,22 @@ public class NeighbourCommunicationManager {
                 System.out.println(post);
                 System.out.println("fpList size : " + fpList.size());
             }
+            mergePosts(fpList);
             System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 
             System.out.print(distributorNode.getShell());
         }
 
+    }
+
+    public void mergePosts(ArrayList<FilePost> fpList) {
+        Map<String, FilePost> postsMap = node.getWall().getFiles();
+        for (FilePost fp : fpList) {
+            if (postsMap.containsKey(fp.getId())) {
+                // merge
+            } else {
+                node.getWall().addToWall(fp, fp.getId());
+            }
+        }
     }
 }
