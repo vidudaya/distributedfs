@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -308,7 +309,7 @@ public class NeighbourCommunicationManager {
             if (postsMap.containsKey(receivedFp.getId())) {
                 FilePost existingFp = postsMap.get(receivedFp.getId());
                 // merge the ranks and comments
-                // mergeRanks(existingFp, receivedFp)
+                mergeRanks(existingFp, receivedFp);
                 mergeComments(existingFp, receivedFp);
             } else {
                 // new post
@@ -328,15 +329,15 @@ public class NeighbourCommunicationManager {
         List<Comment> existingComments = existingFp.getComments();
         List<Comment> receivedComments = receivedFp.getComments();
 
-        for (Comment comment : receivedComments) {
-            if (existingComments.contains(comment)) {
-                Comment existingComment = existingComments.get(existingComments.indexOf(comment));
+        for (Comment receivedComment : receivedComments) {
+            if (existingComments.contains(receivedComment)) {
+                Comment existingComment = existingComments.get(existingComments.indexOf(receivedComment));
 
                 // since the comment is already in the list, it should be merged
-                //mergeRanks(comment, existingComment)
-                mergeComments(existingComment, comment);
+                mergeRanks(receivedComment, existingComment);
+                mergeComments(existingComment, receivedComment);
             } else {
-                existingComments.add(comment);
+                existingComments.add(receivedComment);
             }
         }
     }
@@ -377,11 +378,36 @@ public class NeighbourCommunicationManager {
         for (Comment receivedReplyComment : receivedReplyComments) {
             if (existingReplyComments.contains(receivedReplyComment)) {
                 Comment existingReplyComment = existingReplyComments.get(existingReplyComments.indexOf(receivedReplyComment));
-                // mergeRanks
+
+                mergeRanks(existingReplyComment, receivedReplyComment);
                 mergeComments(existingReplyComment, receivedReplyComment);
             } else {
                 existingReplyComments.add(receivedReplyComment);
             }
         }
+    }
+
+    /**
+     * Merge the Ranks of FilePosts
+     *
+     * @param existingFp
+     * @param receivedFp
+     */
+    private void mergeRanks(FilePost existingFp, FilePost receivedFp) {
+        Set<Rank> existingFpRanks = existingFp.getRanks();
+        Set<Rank> receivedFpRanks = receivedFp.getRanks();
+        existingFpRanks.addAll(receivedFpRanks);
+    }
+
+    /**
+     * Merge the Ranks of Comments
+     *
+     * @param existingComment
+     * @param receivedComment
+     */
+    private void mergeRanks(Comment existingComment, Comment receivedComment) {
+        Set<Rank> existingCommentRanks = existingComment.getRanks();
+        Set<Rank> receivedCommentRanks = receivedComment.getRanks();
+        existingCommentRanks.addAll(receivedCommentRanks);
     }
 }
