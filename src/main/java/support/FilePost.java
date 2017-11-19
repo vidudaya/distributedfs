@@ -2,10 +2,7 @@ package support;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by vidudaya on 15/11/17.
@@ -38,12 +35,20 @@ public class FilePost {
     }
 
     public static void addCommentsToShow(List<Comment> coms, StringBuilder show, int indent) {
+        // sort the coms list
+        Collections.sort(coms, new Comparator<Comment>() {
+            public int compare(Comment o1, Comment o2) {
+                return o1.getCommentTimestamp() - o2.getCommentTimestamp();
+            }
+        });
+
         String gap = "";
         for (int i = 0; i < indent; i++) {
             gap += "\t";
         }
         for (Comment com : coms) {
-            show.append(gap).append("[" + com.getId() + "]" + com.getComment() + "[" + com.getRank() + "]" + "\n");
+            //show.append(gap).append("[" + com.getId() + "]" + com.getComment() + "[" + com.getRank() + "]" + "\n");
+            show.append(gap).append("[" + com.getId() + "]" + com.getComment() + "[" + com.getRank() + "] " +com.getCommentTimestamp()+ "\n");
             if (!com.getComments().isEmpty()) {
                 addCommentsToShow(com.getComments(), show, indent + 1);
             }
