@@ -13,11 +13,12 @@ public class Comment {
     private List<Comment> comments;
     private Set<Rank> ranks;
     private String comment;
+    private Integer commentTimestamp;
 
     public Comment() {
     }
 
-    public Comment(String comment, Node node) {
+    public Comment(String comment, Node node, Integer timestamp) {
         this.comment = comment;
         Random rand = new Random();
         String commentId = comment.hashCode() + rand.nextInt(200) + node.getNodeIdentifier(); // change this to be more unique with timestamp or lamport timestamp
@@ -25,6 +26,7 @@ public class Comment {
 
         comments = new ArrayList<Comment>();
         ranks = new HashSet<Rank>();
+        this.commentTimestamp = timestamp;
     }
 
     public Comment getCommentWithId(String id) {
@@ -37,8 +39,8 @@ public class Comment {
         return null;
     }
 
-    public void addRank(Integer rank, String userName) {
-        this.ranks.add(new Rank(rank, userName));
+    public void addRank(Integer rank, String userName, Integer timestamp) {
+        this.ranks.add(new Rank(rank, userName, timestamp));
     }
 
     public void addComment(Comment comment) {
@@ -86,5 +88,13 @@ public class Comment {
     @Override
     public int hashCode() {
         return id.hashCode();
+    }
+
+    public Integer getCommentTimestamp() {
+        return commentTimestamp;
+    }
+
+    public void setCommentTimestamp(Integer commentTimestamp) {
+        this.commentTimestamp = commentTimestamp;
     }
 }

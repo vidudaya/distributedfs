@@ -6,10 +6,12 @@ package support;
 public class Rank {
     private String user;
     private Integer rank; // the rank given by the user
+    private Integer rankTimestamp;
 
-    public Rank(Integer rank, String user) {
+    public Rank(Integer rank, String user, Integer timestamp) {
         this.rank = rank;
         this.user = user;
+        this.rankTimestamp = timestamp;
     }
 
     public Rank() {
@@ -37,5 +39,13 @@ public class Rank {
 
     public String getUser() {
         return user;
+    }
+
+    public Integer getRankTimestamp() {
+        return rankTimestamp;
+    }
+
+    public void setRankTimestamp(Integer rankTimestamp) {
+        this.rankTimestamp = rankTimestamp;
     }
 }

@@ -50,8 +50,8 @@ public class FilePost {
         }
     }
 
-    public void addRank(Integer rank, String userName) {
-        this.ranks.add(new Rank(rank, userName));
+    public void addRank(Integer rank, String userName, Integer timestamp) {
+        this.ranks.add(new Rank(rank, userName, timestamp));
     }
 
     public void addComment(Comment comment) {

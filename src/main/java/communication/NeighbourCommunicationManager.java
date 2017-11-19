@@ -39,12 +39,14 @@ public class NeighbourCommunicationManager {
 
         String uniqueId = commonSupport.getUniqueId();
         //length SER IP port name file_name hops req_id
-        String messageToSend = commonSupport.generateMessageToSend(SEARCH, distributorNode.getIp()
+        String messageToSend = commonSupport.generateMessageToSend(SEARCH
+                , distributorNode.getIp()
                 , String.valueOf(distributorNode.getPort())
                 , distributorNode.getNodeIdentifier()
                 , fileName
                 , "1"
-                , uniqueId);
+                , uniqueId
+                , String.valueOf(node.incrementTimestamp()));
 
         distributorNode.getRequestCache().addToCache(uniqueId);
 
@@ -77,7 +79,7 @@ public class NeighbourCommunicationManager {
     public void joinWithNeighbour(NeighbourNode neighbour, Node node) {
         //length JOIN IP_address port_no name
         String message = JOIN.concat(BLANK).concat(node.getIp()).concat(BLANK).concat(String.valueOf(node.getPort()))
-                .concat(BLANK).concat(node.getNodeIdentifier());
+                .concat(BLANK).concat(node.getNodeIdentifier()).concat(BLANK).concat(String.valueOf(node.incrementTimestamp()));
         int length = message.length() + 5;
         String messageToSend = commonSupport.getFormattedNumber(length, 4).concat(BLANK).concat(message);
         sender.sendMessage(messageToSend, neighbour.getIp(), neighbour.getPort());
@@ -99,15 +101,18 @@ public class NeighbourCommunicationManager {
             String ip = tokens[2].trim();
             String port = tokens[3].trim();
             String name = tokens[4].trim();
+            String timestamp = tokens[5].trim();
 
             try {
                 Integer portNum = Integer.parseInt(port);
                 NeighbourNode newNode = new NeighbourNode(ip, portNum, name);
                 boolean success = distributorNode.getRoutingTable().addToRoutingTable(newNode);
 
+                Integer timestampInt = Integer.parseInt(timestamp);
+                node.setNodeTimestamp(timestampInt);
                 if (success) {
                     // send JOINOK with 0
-                    String message = JOINOK.concat(BLANK).concat("0");
+                    String message = JOINOK.concat(BLANK).concat("0").concat(BLANK).concat(String.valueOf(node.incrementTimestamp()));
                     int length = message.length() + 5;
                     String messageToSend = commonSupport.getFormattedNumber(length, 4).concat(BLANK).concat(message);
                     sender.sendMessage(messageToSend, newNode.getIp(), newNode.getPort());
@@ -151,6 +156,10 @@ public class NeighbourCommunicationManager {
         } else if (JOINOK.equals(cmd)) {
             if (distributorNode.isDebugMode()) {
                 if ("0".equals(tokens[2])) {
+                    String timestamp = tokens[3].trim();
+                    Integer timestampInt = Integer.parseInt(timestamp);
+                    node.setNodeTimestamp(timestampInt);
+
                     System.out.println(distributorNode.getShell()
                             .concat("Join Success"));
                 } else if ("9999".equals(tokens[2])) {
@@ -178,9 +187,14 @@ public class NeighbourCommunicationManager {
             String fileName = tokens[5].trim();
             String hops = tokens[6].trim();
             String reqId = tokens[7].trim();
+            String timestamp = tokens[8].trim();
+
             int hopsCount = 0;
             int portNum = 0;
             try {
+                Integer timestampInt = Integer.parseInt(timestamp);
+                node.setNodeTimestamp(timestampInt);
+
                 hopsCount = Integer.parseInt(hops) + 1;
                 portNum = Integer.parseInt(port);
             } catch (NumberFormatException e) {
@@ -204,6 +218,7 @@ public class NeighbourCommunicationManager {
                                 , String.valueOf(distributorNode.getPort())
                                 , distributorNode.getNodeIdentifier()
                                 , String.valueOf(hopsCount)
+                                , String.valueOf(node.incrementTimestamp())
                                 , commonSupport.getCombinedStringOfFilePostMatches(fpStore));
 
                         if (distributorNode.isDebugMode()) {
@@ -226,7 +241,8 @@ public class NeighbourCommunicationManager {
                                 , name
                                 , fileName
                                 , String.valueOf(hopsCount)
-                                , reqId);
+                                , reqId
+                                , String.valueOf(node.incrementTimestamp()));
                         forwardSearchMessageToRoutingTable(messageToSend, distributorNode);
                     } else {
                         if (distributorNode.isDebugMode()) {
@@ -250,12 +266,16 @@ public class NeighbourCommunicationManager {
             String port = tokens[4].trim();
             String name = tokens[5].trim();
             String hops = tokens[6].trim();
+            String timestamp = tokens[7].trim();
             int countOfFiles = 0;
             int hopsCount = 0;
             int portNum = 0;
             int pointer = 7;
 
             try {
+                Integer timestampInt = Integer.parseInt(timestamp);
+                node.setNodeTimestamp(timestampInt);
+
                 countOfFiles = Integer.parseInt(count);
                 hopsCount = Integer.parseInt(hops) + 1;
                 portNum = Integer.parseInt(port);

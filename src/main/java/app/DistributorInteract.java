@@ -30,6 +30,7 @@ public class DistributorInteract {
     // help menu for commands
     private final String HELP = "HELP";
     private final String SELECT = "SELECT";
+    private final String TIMESTAMP = "TIMESTAMP";
     private Node distributorNode;
     private BufferedReader br;
     private CommonSupport commonSupport;
@@ -46,7 +47,10 @@ public class DistributorInteract {
             if (br.ready()) {
                 command = br.readLine().trim().toLowerCase();
 
-                if (SHOW.toLowerCase().equals(command)) {
+                if (TIMESTAMP.toLowerCase().equals(command)) {
+                    System.out.println("Node timestamp : " + distributorNode.getNodeTimestamp());
+                    System.out.print("\n" + distributorNode.getShell());
+                } else if (SHOW.toLowerCase().equals(command)) {
                     //distributorNode.getTextStore().printFileList();
                     distributorNode.getWall().printFileList();
                     System.out.print("\n" + distributorNode.getShell());

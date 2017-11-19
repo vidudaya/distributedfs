@@ -32,6 +32,7 @@ public class Node {
     private boolean isDebugMode;
     private String shell;
     private Wall wall;
+    private Integer nodeTimestamp;
 
     public Node(String ip, Integer port, String nodeIdentifier) {
         this.ip = ip;
@@ -52,6 +53,7 @@ public class Node {
         this.fileSearch = new FileSearch(this);
         this.isDebugMode = true;
         this.shell = nodeIdentifier.concat(" > ");
+        this.nodeTimestamp = 1;
     }
 
     public void registerNodeWithBS(String serverIP, int serverPort) {
@@ -197,7 +199,7 @@ public class Node {
     }
 
     public void commentOnPostItem(String id, String msg) {
-        Comment comment = new Comment(msg, this);
+        Comment comment = new Comment(msg, this, incrementTimestamp());
         for (FilePost fp : wall.getFiles().values()) {
             if (fp.getId().equals(id)) {
                 fp.addComment(comment);
@@ -218,18 +220,30 @@ public class Node {
     public void rankPostItem(String id, String rating) {
         for (FilePost fp : wall.getFiles().values()) {
             if (fp.getId().equals(id)) {
-                fp.addRank(Integer.valueOf(rating), this.nodeIdentifier);
+                fp.addRank(Integer.valueOf(rating), this.nodeIdentifier, incrementTimestamp());
                 return;
             } else {
                 for (Comment com : fp.getComments()) {
                     Comment comSelected = com.getCommentWithId(id);
                     if (comSelected != null) {
-                        comSelected.addRank(Integer.valueOf(rating), this.nodeIdentifier);
+                        comSelected.addRank(Integer.valueOf(rating), this.nodeIdentifier, incrementTimestamp());
                         return;
                     }
                 }
             }
         }
         System.out.println("Ratings failed - No match for the entered id");
+    }
+
+    public Integer getNodeTimestamp() {
+        return nodeTimestamp;
+    }
+
+    public void setNodeTimestamp(Integer timestamp) {
+        this.nodeTimestamp = Math.max(nodeTimestamp, timestamp) + 1;
+    }
+
+    public Integer incrementTimestamp() {
+        return nodeTimestamp++;
     }
 }
