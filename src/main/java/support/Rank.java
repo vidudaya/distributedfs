@@ -12,6 +12,9 @@ public class Rank {
         this.user = user;
     }
 
+    public Rank() {
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

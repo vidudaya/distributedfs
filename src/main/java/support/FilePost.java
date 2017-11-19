@@ -23,6 +23,9 @@ public class FilePost {
         ranks = new HashSet<Rank>();
     }
 
+    public FilePost() {
+    }
+
     public static String displayPost(FilePost post) {
         StringBuilder show = new StringBuilder();
         show.append("[" + post.getId() + "]" + post.getFileName()).append("[" + post.getRank() + "]").append("\n");

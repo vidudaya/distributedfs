@@ -11,6 +11,9 @@ public class Comment {
     private Set<Rank> ranks;
     private String comment;
 
+    public Comment() {
+    }
+
     public Comment(String comment, Node node) {
         this.comment = comment;
         Random rand = new Random();
