@@ -10,6 +10,9 @@ import java.io.IOException;
  */
 public class Distributor {
 
+    //java -jar distributedfs-1.0-SNAPSHOT-jar-with-dependencies.jar 127.0.0.1 2000 vid12345 127.0.0.1 20000
+    //java -jar distributedfs-1.0-SNAPSHOT-jar-with-dependencies.jar 127.0.0.1 2001 sam12345 127.0.0.1 20000
+
     private Receiver receiver;
 
     public static void main(String[] args) {

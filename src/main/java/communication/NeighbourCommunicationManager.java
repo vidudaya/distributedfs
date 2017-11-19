@@ -1,11 +1,15 @@
 package communication;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import support.CommonSupport;
 import support.FilePost;
 import support.NeighbourNode;
 import support.Node;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by vidudaya on 4/11/16.
@@ -188,23 +192,24 @@ public class NeighbourCommunicationManager {
             boolean isDuplicateReq = distributorNode.getRequestCache().isPossibleDuplicate(reqId);
             if (!isDuplicateReq) {
                 distributorNode.getRequestCache().addToCache(reqId);
-                ArrayList<String> localStore = distributorNode.getTextStore().returnAllPartialMatches(fileName);
+                //ArrayList<String> localStore = distributorNode.getTextStore().returnAllPartialMatches(fileName);
                 ArrayList<FilePost> fpStore = distributorNode.getWall().returnAllPartialMatches(fileName);
 
                 try {
-                    if (localStore.size() > 0) {
+                    if (fpStore.size() > 0) {
                         //length SEROK no_files IP port name hops filename1 filename2
                         String messageToSend = commonSupport.generateMessageToSend(SEARCHOK
-                                , String.valueOf(localStore.size())
+                                , String.valueOf(fpStore.size())
                                 , distributorNode.getIp()
                                 , String.valueOf(distributorNode.getPort())
                                 , distributorNode.getNodeIdentifier()
                                 , String.valueOf(hopsCount)
-                                , commonSupport.getCombinedStringOfList(localStore));
+                                , commonSupport.getCombinedStringOfFilePostMatches(fpStore));
 
                         if (distributorNode.isDebugMode()) {
-                            System.out.println("Local Search OK : [ " + commonSupport.getCombinedStringOfList(localStore) + " ]");
+                            System.out.println("Local Search OK : [ " + commonSupport.getCombinedStringOfFilePostMatches(fpStore) + " ]");
                         }
+                        // reply to the request
                         sender.sendMessage(messageToSend, ip, portNum);
                     } else {
                         if (distributorNode.isDebugMode()) {
@@ -265,12 +270,30 @@ public class NeighbourCommunicationManager {
 
             System.out.println(("\n").concat(distributorNode.getShell())
                     .concat("[ Total of " + countOfFiles + " matching files found in " + name + " ]"));
-
+            /*
             if (countOfFiles > 0) {
                 for (int i = 0; i < countOfFiles; ++i) {
                     System.out.println("\t\t" + tokens[pointer + i].replaceAll("_", " "));
                 }
+            }*/
+
+            System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+            ObjectMapper mapper = new ObjectMapper();
+            ArrayList<FilePost> fpList = new ArrayList<FilePost>();
+            Matcher m = Pattern.compile("\\[\\[(.*?)\\]\\]").matcher(msg);
+            while (m.find()) {
+                System.out.println(m.group(1));
+                FilePost post = null;
+                try {
+                    post = mapper.readValue(m.group(1), FilePost.class);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                fpList.add(post);
+                System.out.println(post);
+                System.out.println("fpList size : " + fpList.size());
             }
+            System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 
             System.out.print(distributorNode.getShell());
         }

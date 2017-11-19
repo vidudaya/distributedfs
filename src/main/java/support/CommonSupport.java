@@ -1,5 +1,8 @@
 package support;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -89,6 +92,17 @@ public class CommonSupport {
         for (String value : list) {
             value = value.trim().replaceAll(" ", "_"); // for make a single continues string
             messageToSend = messageToSend.concat(BLANK).concat(value);
+        }
+
+        return messageToSend.trim();
+    }
+
+    public String getCombinedStringOfFilePostMatches(ArrayList<FilePost> list) throws JsonProcessingException {
+        String messageToSend = "";
+        ObjectMapper mapper = new ObjectMapper();
+        for (FilePost fp : list) {
+            String jsonVal = mapper.writeValueAsString(fp);
+            messageToSend = messageToSend.concat(BLANK).concat("[[").concat(jsonVal).concat("]]");
         }
 
         return messageToSend.trim();

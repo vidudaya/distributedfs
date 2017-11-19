@@ -1,5 +1,7 @@
 package support;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -8,6 +10,7 @@ import java.util.Set;
 /**
  * Created by vidudaya on 15/11/17.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class FilePost {
     private String id; // id to uniquely identify the FilePost
     private List<Comment> comments;

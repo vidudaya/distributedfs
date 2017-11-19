@@ -1,10 +1,13 @@
 package support;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.util.*;
 
 /**
  * Created by vidudaya on 15/11/17.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Comment {
     private String id; // id to uniquely identify the comment
     private List<Comment> comments;

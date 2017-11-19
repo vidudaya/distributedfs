@@ -34,4 +34,8 @@ public class Rank {
     public Integer getRank() {
         return rank;
     }
+
+    public String getUser() {
+        return user;
+    }
 }
