@@ -61,6 +61,16 @@ public class RoutingTable {
         return knownNodes;
     }
 
+    public ArrayList<NeighbourNode> getRandomNeighbours(int count) {
+        ArrayList<NeighbourNode> knownNodes = new ArrayList<NeighbourNode>(table.values());
+        ArrayList<NeighbourNode> randoms = new ArrayList<NeighbourNode>();
+        Collections.shuffle(knownNodes);
+        for (int i = 0; i < count && i < knownNodes.size(); ++i) {
+            randoms.add(knownNodes.get(i));
+        }
+        return randoms;
+    }
+
     public ArrayList<NeighbourNode> addRandomTwo(ArrayList<NeighbourNode> list) {
         ArrayList<NeighbourNode> selectedNodes = new ArrayList<NeighbourNode>();
         if (list == null || list.isEmpty()) {

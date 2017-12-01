@@ -4,10 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import support.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,6 +20,7 @@ public class NeighbourCommunicationManager {
     private final String SEARCH = "SER";
     private final String SEARCHOK = "SEROK";
     private final String BLANK = " ";
+    private final String UPDATE = "UPDATE";
     private Sender sender;
     private CommonSupport commonSupport;
     private Node node;
@@ -294,6 +292,52 @@ public class NeighbourCommunicationManager {
             System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
             ObjectMapper mapper = new ObjectMapper();
             ArrayList<FilePost> fpList = new ArrayList<FilePost>();
+            Matcher m = Pattern.compile("\\[\\[(.*?)\\]\\]").matcher(msg);
+            while (m.find()) {
+                System.out.println(m.group(1));
+                FilePost post = null;
+                try {
+                    post = mapper.readValue(m.group(1), FilePost.class);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                fpList.add(post);
+                System.out.println(post);
+                System.out.println("fpList size : " + fpList.size());
+            }
+            mergePosts(fpList);
+            System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+
+            System.out.print(distributorNode.getShell());
+        } else if (UPDATE.equals(cmd)) {
+            System.out.println("Msg : " + msg);
+            System.out.println("Tokens : " + Arrays.toString(tokens));
+            String ip = tokens[2].trim();
+            String port = tokens[3].trim();
+            String name = tokens[4].trim();
+            String hops = tokens[5].trim();
+            String timestamp = tokens[6].trim();
+            int hopsCount = 0;
+            int portNum = 0;
+
+            try {
+                Integer timestampInt = Integer.parseInt(timestamp);
+                node.setNodeTimestamp(timestampInt);
+
+                hopsCount = Integer.parseInt(hops) + 1;
+                portNum = Integer.parseInt(port);
+
+                // RT can get larger by this, since non-neighbours can be added also
+                NeighbourNode node = new NeighbourNode(ip, portNum, name);
+                distributorNode.getRoutingTable().addToRoutingTable(node);
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+            }
+
+            System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+            ObjectMapper mapper = new ObjectMapper();
+            ArrayList<FilePost> fpList = new ArrayList<FilePost>();
+            // consider the whole msg
             Matcher m = Pattern.compile("\\[\\[(.*?)\\]\\]").matcher(msg);
             while (m.find()) {
                 System.out.println(m.group(1));

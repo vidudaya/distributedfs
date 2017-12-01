@@ -1,5 +1,7 @@
 package support;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import communication.BSCommunicationManager;
 import communication.NeighbourCommunicationManager;
 import communication.Sender;
@@ -15,6 +17,7 @@ public class Node {
     private final String BLANK = " ";
     private final String REGISTER = "REG";
     private final String UNREG = "UNREG";
+    private final String UPDATE = "UPDATE";
     private final int PAD = 4;
     private String ip;
     private Integer port;
@@ -203,12 +206,15 @@ public class Node {
         for (FilePost fp : wall.getFiles().values()) {
             if (fp.getId().equals(id)) {
                 fp.addComment(comment);
+                distributeTheUpdate(id);
                 return;
             } else {
                 for (Comment com : fp.getComments()) {
+                    // recursively select the matching comment
                     Comment comSelected = com.getCommentWithId(id);
                     if (comSelected != null) {
                         comSelected.addComment(comment);
+                        distributeTheUpdate(fp.getId());
                         return;
                     }
                 }
@@ -221,18 +227,45 @@ public class Node {
         for (FilePost fp : wall.getFiles().values()) {
             if (fp.getId().equals(id)) {
                 fp.addRank(Integer.valueOf(rating), this.nodeIdentifier, incrementTimestamp());
+                distributeTheUpdate(id);
                 return;
             } else {
                 for (Comment com : fp.getComments()) {
+                    // recursively select the matching comment
                     Comment comSelected = com.getCommentWithId(id);
                     if (comSelected != null) {
                         comSelected.addRank(Integer.valueOf(rating), this.nodeIdentifier, incrementTimestamp());
+                        distributeTheUpdate(fp.getId());
                         return;
                     }
                 }
             }
         }
         System.out.println("Ratings failed - No match for the entered id");
+    }
+
+    /**
+     * gossiping the update
+     *
+     * @param id
+     */
+    public void distributeTheUpdate(String id) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            String jsonVal = mapper.writeValueAsString(wall.getFiles().get(id));
+            String messageToSend = commonSupport.generateMessageToSend(UPDATE
+                    , getIp()
+                    , String.valueOf(getPort())
+                    , getNodeIdentifier()
+                    , String.valueOf(1)
+                    , String.valueOf(incrementTimestamp())
+                    , ("[[").concat(jsonVal).concat("]]"));
+            for (NeighbourNode neighbour : getRoutingTable().getRandomNeighbours(2)) {
+                sender.sendMessage(messageToSend, neighbour.getIp(), neighbour.getPort());
+            }
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
     }
 
     public Integer getNodeTimestamp() {
