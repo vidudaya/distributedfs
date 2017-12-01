@@ -91,7 +91,8 @@ public class DistributorInteract {
                     String tokens[] = command.split(" ");
                     String postID = tokens[1];
                     if (distributorNode.getWall().getFiles().containsKey(postID)) {
-                        System.out.println(distributorNode.getWall().getFiles().get(postID));
+                        //System.out.println(distributorNode.getWall().getFiles().get(postID));
+                        System.out.println(distributorNode.getWall().getFiles().get(postID).displayPost(distributorNode.getNodeIdentifier()));
                         System.out.println("#############################");
                         System.out.println("to comment use comment <id> <comment>");
                         System.out.println("to rank use rank <id> <rank between 1-5>");

@@ -9,6 +9,18 @@ import java.util.*;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FilePost {
+    public static final String BLACK = "\u001B[30m";
+    public static final String RED = "\u001B[1;31m";
+    public static final String GREEN = "\u001B[1;32m";
+    public static final String YELLOW = "\u001B[1;33m";
+    public static final String BLUE = "\u001B[34m";
+    public static final String PURPLE = "\u001B[1;35m";
+    public static final String CYAN = "\u001B[1;36m";
+    public static final String WHITE = "\u001B[37m";
+    //Reset code
+    public static final String RESET = "\u001B[0m";
+    //public static final String MARK = "✓";
+    public static final String MARK = "\uD83D\uDC4D";
     private String id; // id to uniquely identify the FilePost
     private List<Comment> comments;
     private Set<Rank> ranks;
@@ -48,9 +60,55 @@ public class FilePost {
         }
         for (Comment com : coms) {
             //show.append(gap).append("[" + com.getId() + "]" + com.getComment() + "[" + com.getRank() + "]" + "\n");
-            show.append(gap).append("[" + com.getId() + "]" + com.getComment() + "[" + com.getRank() + "] " +com.getCommentTimestamp()+ "\n");
+            //show.append(gap).append("[" + com.getId() + "]" + com.getComment() + "[" + com.getRank() + "] " +com.getCommentTimestamp()+ "\n");
+            show.append(gap).append("[" + com.getId() + "]" + com.getComment() + "[" + com.getRank() + "] " + "\n");
             if (!com.getComments().isEmpty()) {
                 addCommentsToShow(com.getComments(), show, indent + 1);
+            }
+        }
+    }
+
+    public String displayPost(String nodeName) {
+        return displayPost(this, nodeName);
+    }
+
+    public String displayPost(FilePost post, String nodeName) {
+        StringBuilder show = new StringBuilder();
+        Rank rank = new Rank(0, nodeName, 0);
+        if (post.getRanks().contains(rank)) {
+            show.append("[" + CYAN + post.getId() + RESET + "] " + GREEN + post.getFileName() + RESET).append(" [" + RED + post.getRank() + RESET + "] ").append(PURPLE + MARK + RESET).append("\n");
+        } else {
+            show.append("[" + CYAN + post.getId() + RESET + "] " + GREEN + post.getFileName() + RESET).append(" [" + RED + post.getRank() + RESET + "] ").append("\n");
+        }
+        addCommentsToShow(post.getComments(), show, 1, nodeName);
+
+        return show.toString();
+    }
+
+    public void addCommentsToShow(List<Comment> coms, StringBuilder show, int indent, String nodeName) {
+        // sort the coms list
+        Collections.sort(coms, new Comparator<Comment>() {
+            public int compare(Comment o1, Comment o2) {
+                return o1.getCommentTimestamp() - o2.getCommentTimestamp();
+            }
+        });
+
+        String gap = "";
+        for (int i = 0; i < indent; i++) {
+            gap += "\t";
+        }
+        Rank rank = new Rank(0, nodeName, 0);
+        for (Comment com : coms) {
+            //show.append(gap).append("[" + com.getId() + "]" + com.getComment() + "[" + com.getRank() + "]" + "\n");
+            //show.append(gap).append("[" + com.getId() + "]" + com.getComment() + "[" + com.getRank() + "] " +com.getCommentTimestamp()+ "\n");
+
+            if (com.getRanks().contains(rank)) {
+                show.append(gap).append("[" + CYAN + com.getId() + RESET + "] " + YELLOW + com.getComment() + RESET + " [" + RED + com.getRank() + RESET + "] " + PURPLE + MARK + RESET + "\n");
+            } else {
+                show.append(gap).append("[" + CYAN + com.getId() + RESET + "] " + YELLOW + com.getComment() + RESET + " [" + RED + com.getRank() + RESET + "] " + "\n");
+            }
+            if (!com.getComments().isEmpty()) {
+                addCommentsToShow(com.getComments(), show, indent + 1, nodeName);
             }
         }
     }
@@ -93,6 +151,10 @@ public class FilePost {
         for (Rank rank : ranks) {
             rankAvg += rank.getRank();
         }
-        return rankAvg / ranks.size(); //  to first decimal point
+        rankAvg = rankAvg / ranks.size();
+        rankAvg = rankAvg * 10;
+        rankAvg = Math.round(rankAvg);
+        rankAvg = rankAvg / 10;
+        return rankAvg; //  to first decimal point
     }
 }
