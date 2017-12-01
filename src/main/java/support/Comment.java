@@ -21,7 +21,7 @@ public class Comment {
     public Comment(String comment, Node node, Integer timestamp) {
         this.comment = comment;
         Random rand = new Random();
-        String commentId = comment.hashCode() + rand.nextInt(200) + node.getNodeIdentifier(); // change this to be more unique with timestamp or lamport timestamp
+        String commentId = Math.abs(comment.hashCode()) + rand.nextInt(200) + node.getNodeIdentifier(); // change this to be more unique with timestamp or lamport timestamp
         this.id = commentId;
 
         comments = new ArrayList<Comment>();

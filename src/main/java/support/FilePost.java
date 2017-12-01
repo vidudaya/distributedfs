@@ -16,7 +16,7 @@ public class FilePost {
 
     public FilePost(String fileName) {
         this.fileName = fileName;
-        String fileId = String.valueOf(fileName.hashCode()); // change this to be more unique with timestamp or lamport timestamp
+        String fileId = String.valueOf(Math.abs(fileName.hashCode())); // change this to be more unique with timestamp or lamport timestamp
         this.id = fileId;
 
         comments = new ArrayList<Comment>();
