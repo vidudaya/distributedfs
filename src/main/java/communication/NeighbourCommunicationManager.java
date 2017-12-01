@@ -354,7 +354,7 @@ public class NeighbourCommunicationManager {
                 Comment existingComment = existingComments.get(existingComments.indexOf(receivedComment));
 
                 // since the comment is already in the list, it should be merged
-                mergeRanks(receivedComment, existingComment);
+                mergeRanks(existingComment, receivedComment);
                 mergeComments(existingComment, receivedComment);
             } else {
                 existingComments.add(receivedComment);

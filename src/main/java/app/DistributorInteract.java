@@ -66,6 +66,7 @@ public class DistributorInteract {
                         String fileNameToSearch = tokens[1];
                         distributorNode.searchFile(fileNameToSearch);
                     }
+                    System.out.print("\n" + distributorNode.getShell());
                 } else if (LOG_OFF.toLowerCase().equals(command)) {
                     distributorNode.setIsDebugMode(false);
                     System.out.println(distributorNode.getShell()
@@ -98,18 +99,20 @@ public class DistributorInteract {
                     } else {
                         System.out.println("No file found for the given ID");
                     }
+                    System.out.print("\n" + distributorNode.getShell());
                 } else if (command.startsWith("comment")) {
                     String tokens[] = command.split(" ");
                     String msg = commonSupport.getStringFromArray(Arrays.copyOfRange(tokens, 2, tokens.length));
 
                     distributorNode.commentOnPostItem(tokens[1], msg);
+                    System.out.print("\n" + distributorNode.getShell());
                 } else if (command.startsWith("rank")) {
                     String tokens[] = command.split(" ");
                     String postID = tokens[1];
                     String rank = tokens[2];
 
                     distributorNode.rankPostItem(postID, rank);
-
+                    System.out.print("\n" + distributorNode.getShell());
                 }
             }
         }
