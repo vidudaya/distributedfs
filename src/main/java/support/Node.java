@@ -253,12 +253,15 @@ public class Node {
         ObjectMapper mapper = new ObjectMapper();
         try {
             String jsonVal = mapper.writeValueAsString(wall.getFiles().get(id));
+            String uniqueId = commonSupport.getUniqueId();
+            getRequestCache().addToCache(uniqueId);
             String messageToSend = commonSupport.generateMessageToSend(UPDATE
                     , getIp()
                     , String.valueOf(getPort())
                     , getNodeIdentifier()
                     , String.valueOf(1)
                     , String.valueOf(incrementTimestamp())
+                    , uniqueId
                     , ("[[").concat(jsonVal).concat("]]"));
             for (NeighbourNode neighbour : getRoutingTable().getRandomNeighbours(2)) {
                 sender.sendMessage(messageToSend, neighbour.getIp(), neighbour.getPort());

@@ -1,5 +1,6 @@
 package communication;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import support.*;
 
@@ -195,9 +196,14 @@ public class NeighbourCommunicationManager {
 
                 hopsCount = Integer.parseInt(hops) + 1;
                 portNum = Integer.parseInt(port);
+
+                // Add the requester to the RT
+                NeighbourNode node = new NeighbourNode(ip, portNum, name);
+                distributorNode.getRoutingTable().addToRoutingTable(node);
             } catch (NumberFormatException e) {
                 e.printStackTrace();
             }
+
             if (distributorNode.isDebugMode()) {
                 System.out.println("Search request for [ " + fileName + " ] from " + name);
             }
@@ -317,43 +323,67 @@ public class NeighbourCommunicationManager {
             String name = tokens[4].trim();
             String hops = tokens[5].trim();
             String timestamp = tokens[6].trim();
+            String reqId = tokens[7].trim();
             int hopsCount = 0;
             int portNum = 0;
 
-            try {
-                Integer timestampInt = Integer.parseInt(timestamp);
-                node.setNodeTimestamp(timestampInt);
-
-                hopsCount = Integer.parseInt(hops) + 1;
-                portNum = Integer.parseInt(port);
-
-                // RT can get larger by this, since non-neighbours can be added also
-                NeighbourNode node = new NeighbourNode(ip, portNum, name);
-                distributorNode.getRoutingTable().addToRoutingTable(node);
-            } catch (NumberFormatException e) {
-                e.printStackTrace();
-            }
-
-            System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-            ObjectMapper mapper = new ObjectMapper();
-            ArrayList<FilePost> fpList = new ArrayList<FilePost>();
-            // consider the whole msg
-            Matcher m = Pattern.compile("\\[\\[(.*?)\\]\\]").matcher(msg);
-            while (m.find()) {
-                System.out.println(m.group(1));
-                FilePost post = null;
+            boolean isDuplicateReq = distributorNode.getRequestCache().isPossibleDuplicate(reqId);
+            if(!isDuplicateReq) {
                 try {
-                    post = mapper.readValue(m.group(1), FilePost.class);
-                } catch (IOException e) {
+                    Integer timestampInt = Integer.parseInt(timestamp);
+                    node.setNodeTimestamp(timestampInt);
+
+                    hopsCount = Integer.parseInt(hops) + 1;
+                    portNum = Integer.parseInt(port);
+
+                    // RT can get larger by this, since non-neighbours can be added also
+                    NeighbourNode node = new NeighbourNode(ip, portNum, name);
+                    distributorNode.getRoutingTable().addToRoutingTable(node);
+                } catch (NumberFormatException e) {
                     e.printStackTrace();
                 }
-                fpList.add(post);
-                System.out.println(post);
-                System.out.println("fpList size : " + fpList.size());
-            }
-            mergePosts(fpList);
-            System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 
+                System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+                ObjectMapper mapper = new ObjectMapper();
+                ArrayList<FilePost> fpList = new ArrayList<FilePost>();
+                // consider the whole msg
+                Matcher m = Pattern.compile("\\[\\[(.*?)\\]\\]").matcher(msg);
+                while (m.find()) {
+                    System.out.println(m.group(1));
+                    FilePost post = null;
+                    try {
+                        post = mapper.readValue(m.group(1), FilePost.class);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    fpList.add(post);
+                    System.out.println(post);
+                    System.out.println("fpList size : " + fpList.size());
+                }
+                mergePosts(fpList);
+                System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+
+                if (hopsCount < 10) {
+                    try {
+                        String jsonVal = mapper.writeValueAsString(fpList.get(0));
+                        // Forward the request to RT
+                        // we need to forward the request as flooding, then without anonymity forward the result
+                        String messageToSend = commonSupport.generateMessageToSend(UPDATE
+                                , ip
+                                , port
+                                , name
+                                , String.valueOf(hopsCount)
+                                , String.valueOf(node.incrementTimestamp())
+                                , reqId
+                                , ("[[").concat(jsonVal).concat("]]"));
+                        for (NeighbourNode neighbour : node.getRoutingTable().getRandomNeighbours(2)) {
+                            sender.sendMessage(messageToSend, neighbour.getIp(), neighbour.getPort());
+                        }
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
             System.out.print(distributorNode.getShell());
         }
 
